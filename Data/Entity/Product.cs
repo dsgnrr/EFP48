@@ -1,20 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EFP48.Data.Entity
+﻿namespace EFP48.Data.Entity
 {
+
+    // Це клас сутність, тут описуємо поля майбутньої таблиці
     public class Product
     {
+        // Автоматично визначається як первинний ключ
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+
+        // Якщо ви створюєте поле як Nullable-тип,
+        // EF створить поле у таблиці яке може містити NULL-значення
         public string? Description { get; set; }
         public double Price { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        // Якщо ви створюєте поле як Nullable-тип,
+        // EF створить поле у таблиці яке може містити NULL-значення
         public DateTime? DeletedAt { get; set; }
 
+
+        // Вам ніхто не забороняє створювати свої методи
         public override string ToString()
         {
             return $"ID: {Id} - Name: {Name}";
