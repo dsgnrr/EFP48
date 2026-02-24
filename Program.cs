@@ -27,12 +27,10 @@ namespace EFP48
         {
             if (values.Count != 0)
             {
-                Console.WriteLine($"-------------- ${entityName} --------------");
+                Console.WriteLine($"\n-------------- ${entityName} --------------");
                 foreach (var item in values)
                 {
-                    Console.WriteLine("\n");
                     Console.WriteLine(item);
-                    Console.WriteLine("\n");
                 }
             }
             else Console.WriteLine($"No: {entityName}");
@@ -52,6 +50,35 @@ namespace EFP48
             return products.ToList();
         }
 
+        public static Product? getProductById(DataContext? dataContext, Guid productId)
+        {
+            if (dataContext == null)
+            {
+                Console.WriteLine("Error: Data context not provided");
+                throw new Exception("Data Context not provided");
+            }
+            // search by primary key
+            //var product = dataContext.Products.Find(productId);
+            // First(throws InvalidOperationExecption якщо не знаходить об'єкт), FirstOrDefault(не кидає виключень, повертає null)
+            //return dataContext.Products.First(p => p.Id == productId);
+
+            var product = dataContext.Products.FirstOrDefault(p => p.Id == productId);
+            return product;
+        }
+
+        public static bool deleteProduct(DataContext? dataContext, Guid productId)
+        {
+            var product = getProductById(dataContext, productId);
+            if (product is not null)
+            {
+                product.DeletedAt = DateTime.Now;
+                dataContext!.SaveChanges();
+                return true;
+            }
+            Console.WriteLine("Product nor found");
+            return false;
+        }
+
         public static void Main(string[] args)
         {
 
@@ -59,17 +86,57 @@ namespace EFP48
 
             DataContext dataContext = new();
 
-
             bool isExit = false;
+            Guid guidParseResult;
+            string userRequest;
             while (!isExit)
             {
                 Console.Clear();
                 int menuItem = ShowProductCrudMenu();
                 switch (menuItem)
                 {
-                    case 1:
+                    case 1: // READ
+                        Console.Clear();
                         var products = getAllProducts(dataContext);
                         printEntity<Product>(products, "Products");
+                        Console.ReadKey();
+                        break;
+                    case 2:
+                        Console.Clear();
+                        Console.Write("Enter productId: ");
+                        userRequest = Console.ReadLine();
+                        if (!Guid.TryParse(userRequest, out guidParseResult)){
+                            Console.Clear();
+                            Console.WriteLine("Guid format is incorrect!");
+                            Console.ReadKey();
+                            break;
+                        }
+                        var product = getProductById(dataContext, guidParseResult);
+                        if(product is null)
+                        {
+                            Console.WriteLine("Product not found!");
+                            Console.ReadKey();
+                        }
+                        else Console.WriteLine(product);
+                            Console.ReadKey();
+                        break;
+                    case 5:
+                        Console.Clear();
+                        Console.Write("Enter productId: ");
+                        userRequest = Console.ReadLine();
+                        if (!Guid.TryParse(userRequest, out guidParseResult))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Guid format is incorrect!");
+                            Console.ReadKey();
+                            break;
+                        }
+                        if(deleteProduct(dataContext, guidParseResult))
+                        {
+                            Console.WriteLine("Product successfuly deleted!");
+                        }
+                        else Console.WriteLine("Product not delete");
+                            Console.ReadKey();
                         break;
 
                 }
