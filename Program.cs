@@ -1,5 +1,6 @@
 ﻿using EFP48.Data;
 using EFP48.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFP48
 {
@@ -85,6 +86,22 @@ namespace EFP48
             // CRUD - Create, Read, Update, Delete
 
             DataContext dataContext = new();
+
+            var category = dataContext.Categories.Include(c=>c.Products).FirstOrDefault();
+            if (category is not null) {
+                var c_products = category.Products;
+                if (c_products is null || c_products.Count <= 0)
+                {
+                    return;
+                }
+                
+                foreach(var p in c_products)
+                {
+                    Console.WriteLine(p);
+                }
+            }
+            return;
+
 
             bool isExit = false;
             Guid guidParseResult;

@@ -24,7 +24,7 @@ namespace EFP48.Data
     {
         // Щоб ваш Ентіті став таблицею необхідно створити DbSet<YourEntity>
         public DbSet<Product> Products { get; set; }
-
+        public DbSet<Category> Categories { get; set; }
         // Конфігурація EntityFramework:
         // тут налаштовується підключення до БД
         // також є можливість налаштувати логування та безліч інших параметрів
@@ -39,6 +39,16 @@ namespace EFP48.Data
                 Integrated Security=True")
                 .LogTo(Console.WriteLine, new[] { Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.CommandExecuted })
                 .EnableSensitiveDataLogging();
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //Необов'язково прописувати. Якщо EF бачить навігаційні властивості, і відповідні(ForeignKey Id's) він сам створить зовнішні ключі
+            // Цей метод потрібен для більшого контролю, якщо ви самі хочете створити зв'язки
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .HasPrincipalKey(c => c.Id);
         }
     }
 }
