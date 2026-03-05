@@ -36,6 +36,20 @@ namespace EFP48
             // СР: Вивести категорію так само у профілі, вивести наступну інформацію: назва категорії, кількість продуктів в категорії. 7хв
 
 
+            var result = _dataContext.Products
+                .GroupBy(p => p.Category.Name)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    Count = g.Count(),
+                    MaxPrice = g.Max(p=>p.Price)
+                })
+                .ToList();
+
+            foreach (var item in result)
+            {
+                Console.WriteLine(item);
+            }
 
 
             /*
@@ -44,7 +58,7 @@ namespace EFP48
              */
 
             #region Select with AutoMapper
-
+            /*
             var expression = new MapperConfigurationExpression();
             expression.AddProfile(new MappingProfile());
             var config = new MapperConfiguration(expression, new LoggerFactory());
@@ -59,7 +73,7 @@ namespace EFP48
             {
                 Console.WriteLine(item);
             }
-
+            */
             #endregion
 
             #region Default Select
@@ -91,8 +105,6 @@ namespace EFP48
             }
             */
             #endregion
-
-
 
             #region AsNoTracking
             /*
