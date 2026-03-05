@@ -17,11 +17,11 @@ namespace EFP48
     {
         /*
          * Для роботи з EF необхідно встановити наступні інструменти:
-         * Microsoft.EntityFrameworkCore
-         * Microsoft.EntityFrameworkCore.Tools
-         * Microsoft.EntityFrameworkCore.Design
-         * Microsoft.EntityFrameworkCore.SqlServer
-         * Якщо працюєте з MySql: замість SqlServer ставимо Pomelo.EntityFrameworkCore.MySql
+         * Microsoft.EntityFrameworkCore - основне ядро, сам фреймворк
+         * Microsoft.EntityFrameworkCore.Tools - набір інструментів для PackageManager Console
+         * Microsoft.EntityFrameworkCore.Design - dotnet-ef CLI
+         * Microsoft.EntityFrameworkCore.SqlServer - драйвер для MSSQL
+         * Якщо працюєте з MySql: замість SqlServer ставимо Pomelo.EntityFrameworkCore.MySql драйвер для MySQL
          * 
          * для коректної роботи версії цих пакетів мають бути однаковими, і відповідати номеру версії .NET
          * якщо .NET 9-ї версії, відповідно версії цих пакетів мають бути 9-ю версією.
