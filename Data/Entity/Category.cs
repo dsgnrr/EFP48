@@ -10,7 +10,7 @@ namespace EFP48.Data.Entity
         public Guid Id { get; set; }
 
         [Column(TypeName = "varchar(255)")]
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
 
         [Column(TypeName = "varchar(MAX)")]
         public string? Description { get; set; }

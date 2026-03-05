@@ -35,7 +35,7 @@ namespace EFP48.Data
             // налаштовуємо логування(тільки вивод SQL-запитів)
             optionsBuilder.UseSqlServer(
                 @"Data Source=(LocalDB)\MSSQLLocalDB;
-                Initial Catalog=efp48;
+                Initial Catalog=efp481;
                 Integrated Security=True");
             //.LogTo(Console.WriteLine, new[] { Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.CommandExecuted })
             //.EnableSensitiveDataLogging();
