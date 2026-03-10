@@ -1,4 +1,4 @@
-﻿using EFP48.Data.Entity;
+﻿using EFP48.EFCore.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EFP48.Data
+namespace EFP48.EFCore.Data
 {
     // Клас контексту даних, який містить набори сутностей
 

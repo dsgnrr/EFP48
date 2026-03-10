@@ -1,4 +1,4 @@
-﻿namespace EFP48.Data.Model
+﻿namespace EFP48.EFCore.Data.Model
 { 
     public class ProductCardModel
     {

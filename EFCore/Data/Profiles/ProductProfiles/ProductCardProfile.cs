@@ -1,4 +1,4 @@
-﻿namespace EFP48.Data.Profiles.ProductProfiles
+﻿namespace EFP48.EFCore.Data.Profiles.ProductProfiles
 {
     public class ProductCardProfile
     {

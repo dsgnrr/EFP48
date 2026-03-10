@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using EFP48.Data.Entity;
-using EFP48.Data.Profiles.ProductProfiles;
+using EFP48.EFCore.Data.Entity;
+using EFP48.EFCore.Data.Profiles.ProductProfiles;
 
-namespace EFP48.Data.Profiles
+namespace EFP48.EFCore.Data.Profiles
 {
     public class MappingProfile:Profile
     {

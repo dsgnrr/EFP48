@@ -1,191 +1,111 @@
-﻿using AutoMapper;
-using EFP48.Data;
-using EFP48.Data.Entity;
-using EFP48.Data.Model;
-using EFP48.Data.Profiles;
-using EFP48.Data.Profiles.ProductProfiles;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Logging;
+﻿using Dapper;
+using EFP48.DapperCore.Entity;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
+
 
 namespace EFP48
 {
     public class Program
     {
-        /*
-         * Для роботи з EF необхідно встановити наступні інструменти:
-         * Microsoft.EntityFrameworkCore - основне ядро, сам фреймворк
-         * Microsoft.EntityFrameworkCore.Tools - набір інструментів для PackageManager Console
-         * Microsoft.EntityFrameworkCore.Design - dotnet-ef CLI
-         * Microsoft.EntityFrameworkCore.SqlServer - драйвер для MSSQL
-         * Якщо працюєте з MySql: замість SqlServer ставимо Pomelo.EntityFrameworkCore.MySql драйвер для MySQL
-         * 
-         * для коректної роботи версії цих пакетів мають бути однаковими, і відповідати номеру версії .NET
-         * якщо .NET 9-ї версії, відповідно версії цих пакетів мають бути 9-ю версією.
-         
-         */
+
 
         public static void Main(string[] args)
         {
+            // TODO: Відокремити логіку створення таблиць та данних в окремі методи
+            string connectionString = @"
+Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\semenyuk_o\Documents\GitHub\EFP48\db_dapper.mdf;Integrated Security=True
+";
+            using IDbConnection connection = new SqlConnection(connectionString);
 
-            DataContext _dataContext = new();
+            string query = @"
+DROP TABLE IF EXISTS Users;
+CREATE TABLE Users
+(
+    Id UNIQUEIDENTIFIER PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Surname NVARCHAR(255) NOT NULL,
+    Age INT NOT NULL
+);
+";
+            //connection.Execute(query);
 
-            // СР: Вивести категорію так само у профілі, вивести наступну інформацію: назва категорії, кількість продуктів в категорії. 7хв
+            var users = new List<User>
+            {
+                new User{ Id = Guid.NewGuid(), Name="Tom", Surname= "Due", Age= 25},
+                new User{ Id = Guid.NewGuid(), Name="Alex", Surname="Jackson", Age= 25},
+                new User{ Id = Guid.NewGuid(), Name="Bill", Surname="White", Age= 25},
+            };
 
+            query = @"INSERT INTO Users(Id, Name, Surname, Age) VALUES(@Id, @Name, @Surname, @Age)";
+            //connection.Execute(query, users);
 
-            var result = _dataContext.Products
-                .GroupBy(p => p.Category.Name)
-                .Select(g => new
+            query = @"SELECT * FROM Users as u ORDER BY u.Age DESC";
+
+            var q_users = connection.Query<User>(query).ToList();
+
+            if(q_users != null)
+            {
+                foreach (var item in q_users)
                 {
-                    Category = g.Key,
-                    Count = g.Count(),
-                    MaxPrice = g.Max(p=>p.Price)
-                })
-                .ToList();
-
-            foreach (var item in result)
-            {
-                Console.WriteLine(item);
-            }
-
-
-            /*
-             SELECT * -- all data
-             SELECT Name Price -- part of data
-             */
-
-            #region Select with AutoMapper
-            /*
-            var expression = new MapperConfigurationExpression();
-            expression.AddProfile(new MappingProfile());
-            var config = new MapperConfiguration(expression, new LoggerFactory());
-
-            IMapper mapper = config.CreateMapper();
-
-            var products = _dataContext.Products.Include(p=>p.Category).ToList();
-
-            var productMap = mapper.Map<List<ProductCardProfile>>(products);
-
-            foreach (var item in productMap)
-            {
-                Console.WriteLine(item);
-            }
-            */
-            #endregion
-
-            #region Default Select
-            /*
-            // Select to anonymous product
-            var products = _dataContext.Products.Select(p => new
-            {
-                id = p.Id,
-                name = p.Name
-            }).ToList();
-
-            foreach (var item in products)
-            {
-                Console.WriteLine(item);
-            }
-
-            // Select to mapping
-            List<ProductCardModel> productCards = _dataContext.Products
-                .Select(p => new ProductCardModel
-                {
-                    Name = p.Name,
-                    Price = p.Price,
-                    CategoryName= p.Category!=null? p.Category.Name : "no-category"
-                }).ToList();
-
-            foreach (var item in productCards)
-            {
-                Console.WriteLine(item);
-            }
-            */
-            #endregion
-
-            #region AsNoTracking
-            /*
-            Product? product = _dataContext.Products.AsNoTracking().First();
-            Console.WriteLine(product);
-
-
-            product.Name = $"[CHANGED]${product.Name}";
-            _dataContext.SaveChanges();
-            */
-            #endregion
-
-            #region CRUD
-
-            /*
-            // ### (CREATE) ADD new record. Ми додаємо новий продукт
-
-            //// IQueryable
-            //_dataContext
-            //    .Products
-            //    .Add(new()
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        CategoryId= Guid.Parse("34c0032d-9a67-40a8-b6c4-8c0d15b23650"),
-            //        Name = "Product",
-            //        Price = 300.0,
-            //        Description = "descr",
-            //        CreatedAt = DateTime.Now,
-            //    });
-            //_dataContext.SaveChanges();
-
-            //## (READ) Get product with specified ID.
-            Product? searchedProduct = _dataContext.Products.FirstOrDefault(p => p.Id == Guid.Parse("c32f3166-cc41-4e74-b18b-17705c71ee32"));
-
-            //## (UPDATE) Update some attributes of product.
-            if (searchedProduct != null)
-            {
-                //searchedProduct.Name = "Lenovo ThinkCenter i7 DDR38GB";
-                //_dataContext.SaveChanges();
-
-                //## (DELETE) Delete this product
-                //## Soft delete
-                //searchedProduct.DeletedAt = DateTime.Now;
-                //_dataContext.SaveChanges();
-
-
-
-
-                //## Hard delete
-                _dataContext.Products.Remove(searchedProduct);
-                _dataContext.SaveChanges();
-            }
-            */
-            #endregion
-
-            #region Include
-            /*
-            // Include - дозволяє включити пов'зані сутності. В нашому прикладі, разом з категоріями, будуть підвантажуватися
-            // продукти відповідно конкретній категорії.
-            IQueryable<Category> query = _dataContext
-                .Categories
-                .Include(c => c
-                .Products
-                .Where(p=>p.DeletedAt == null)
-                .OrderBy(p => p.Name));
-            var categories = query.ToList();
-            foreach (var category in categories)
-            {
-                Console.WriteLine($"CategoryID: {category.Id}, CategoryName: ${category.Name}\n");
-                if (category.Products is not null)
-                {
-                    Console.WriteLine("------------------------------------");
-                    foreach (var product in category.Products)
-                    {
-                        Console.WriteLine(product);
-                    }
-                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine(item);
                 }
             }
-            */
-            #endregion
+
+            Guid searchId = Guid.Parse("53650437-bf01-459f-88ac-4da60f0e00ff");
+
+
+            query = @"SELECT u.Name, u.Surname FROM Users as u WHERE u.Id = @Id";
+            var user = connection.QueryFirstOrDefault<UserCard>(query, new { Id = searchId });
+            
+
+
+            if(user != null) Console.WriteLine(user);
+
+            query = @"
+DROP TABLE IF EXISTS Posts;
+CREATE TABLE Posts
+(
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    Title NVARCHAR(200),
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    DeletedAt DATETIME DEFAULT NULL,
+    CONSTRAINT fk_post_user FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+";
+
+            //connection.Execute(query);
+
+            query = @"INSERT INTO Posts(UserId, Title) VALUES(@UserId, @Title)";
+
+            var list = new[]
+            {
+                new {UserId = Guid.Parse("53650437-bf01-459f-88ac-4da60f0e00ff"), Title= "Oh this a great day"},
+                new {UserId = Guid.Parse("ccfca5d4-9084-4edf-9e1f-17bb36f23b81"), Title= "Hello world"}
+            }.ToList();
+
+            connection.Execute(query, list);
+
+            // використовуємо тільки якщо не використовуємо using. Connection це некерованний ресурс.
+            //connection.Close();
+        }
+    }
+    class UserCard
+    {
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public override string ToString()
+        {
+            return $@"
+----------------------
+Name -> {Name}
+Surname -> {Surname}
+----------------------
+";
         }
     }
 }

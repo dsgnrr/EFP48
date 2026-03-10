@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EFP48.Data.Entity
+namespace EFP48.EFCore.Data.Entity
 {
     [Table("my_categories")]
     public class Category

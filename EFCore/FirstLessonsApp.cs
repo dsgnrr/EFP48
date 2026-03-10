@@ -1,5 +1,5 @@
-﻿using EFP48.Data;
-using EFP48.Data.Entity;
+﻿using EFP48.EFCore.Data;
+using EFP48.EFCore.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFP48

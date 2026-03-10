@@ -1,4 +1,4 @@
-﻿namespace EFP48.Data.Entity
+﻿namespace EFP48.EFCore.Data.Entity
 {
 
     // Це клас сутність, тут описуємо поля майбутньої таблиці
