@@ -88,10 +88,33 @@ CREATE TABLE Posts
                 new {UserId = Guid.Parse("ccfca5d4-9084-4edf-9e1f-17bb36f23b81"), Title= "Hello world"}
             }.ToList();
 
-            connection.Execute(query, list);
+            //connection.Execute(query, list);
 
             // використовуємо тільки якщо не використовуємо using. Connection це некерованний ресурс.
             //connection.Close();
+
+            query = @"
+SELECT u.Name, u.Surname, p.Title
+FrOm Users u
+JOIN Posts p ON u.Id = p.UserId;
+";
+
+            var result = connection.Query<User, Post, Post>(
+                query,
+                (user, post) =>
+                {
+                    post.User = user;
+                    return post;
+                }, splitOn:"Title");
+
+            Console.WriteLine("Count: {0}", result.Count());
+
+            foreach (var item in result)
+            {
+                Console.WriteLine(item.Title);
+                Console.WriteLine(item.User);
+            }
+
         }
     }
     class UserCard
