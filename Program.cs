@@ -47,7 +47,7 @@ CREATE TABLE Users
 
             var q_users = connection.Query<User>(query).ToList();
 
-            if(q_users != null)
+            if (q_users != null)
             {
                 foreach (var item in q_users)
                 {
@@ -60,10 +60,10 @@ CREATE TABLE Users
 
             query = @"SELECT u.Name, u.Surname FROM Users as u WHERE u.Id = @Id";
             var user = connection.QueryFirstOrDefault<UserCard>(query, new { Id = searchId });
-            
 
 
-            if(user != null) Console.WriteLine(user);
+
+            if (user != null) Console.WriteLine(user);
 
             query = @"
 DROP TABLE IF EXISTS Posts;
@@ -94,7 +94,7 @@ CREATE TABLE Posts
             //connection.Close();
 
             query = @"
-SELECT u.Name, u.Surname, p.Title
+SELECT u.Id, u.Name, u.Surname, u.Age,p.Title
 FrOm Users u
 JOIN Posts p ON u.Id = p.UserId;
 ";
@@ -105,7 +105,7 @@ JOIN Posts p ON u.Id = p.UserId;
                 {
                     post.User = user;
                     return post;
-                }, splitOn:"Title");
+                }, splitOn: "Title");
 
             Console.WriteLine("Count: {0}", result.Count());
 
@@ -115,8 +115,37 @@ JOIN Posts p ON u.Id = p.UserId;
                 Console.WriteLine(item.User);
             }
 
+            query = @"
+SELECT (u.Name+' '+u.Surname) as FullName, COUNT(p.Id) as PostCount 
+FROM Users u
+LEFT JOIN Posts p ON u.Id = p.UserId
+GROUP BY u.Name, u.Surname
+";
+
+            var postCount_result = connection.Query<UserPostCount>(query).ToList();
+
+            foreach (var item in postCount_result)
+            {
+                Console.WriteLine($"{item.FullName}-> posts: {item.PostCount}");
+            }
+
         }
+
+
+        /*
+         1) В БД додайте до кожного користувача ще по декілька постів
+
+         2) В програмі, поверніть для кожного користувача самий останній пост
+         
+         */
     }
+
+    class UserPostCount
+    {
+        public string FullName { get; set; }
+        public int PostCount { get; set; }
+    }
+
     class UserCard
     {
         public string Name { get; set; }
